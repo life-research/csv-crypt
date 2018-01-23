@@ -25,7 +25,7 @@
     (csv/write-csv file data)))
 
 (defn encrypt-line
-  {:arglists '([line])}
+  {:arglists '([key line])}
   [key [first & rest]]
   (let [iv (nonce/random-bytes 16)
         clear-text (json/generate-cbor rest)
@@ -34,7 +34,7 @@
     [first (Base64/encodeBase64String (bytes/concat iv cipher-text))]))
 
 (defn decrypt-line
-  {:arglists '([line])}
+  {:arglists '([key line])}
   [key [first second]]
   (let [iv-and-cipher-text (Base64/decodeBase64 ^String second)
         iv (bytes/slice iv-and-cipher-text 0 16)
