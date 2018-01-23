@@ -8,10 +8,10 @@
   :pedantic? :abort
 
   :dependencies
-  [[buddy/buddy-core "1.2.0"]
-   [cheshire "5.7.1"]
-   [org.clojure/clojure "1.8.0"]
-   [org.clojure/data.csv "0.1.3"]
+  [[buddy/buddy-core "1.4.0"]
+   [cheshire "5.8.0"]
+   [org.clojure/clojure "1.9.0"]
+   [org.clojure/data.csv "0.1.4"]
    [org.clojure/tools.cli "0.3.5"]]
 
   :profiles

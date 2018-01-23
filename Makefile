@@ -9,7 +9,7 @@ csv-crypt-$(version)-standalone.jar: target/csv-crypt-$(version)-standalone.jar
 csv-crypt-$(version).zip: csv-crypt-$(version)-standalone.jar csv-crypt.bat
 	zip $@ $< csv-crypt.bat
 
-csv-crypt: csv-crypt.sh
+csv-crypt: csv-crypt.sh csv-crypt-$(version)-standalone.jar
 	cp $< $@
 	chmod +x $@
 

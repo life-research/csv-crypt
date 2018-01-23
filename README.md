@@ -1,5 +1,7 @@
 # CSV Crypt
 
+[![Dependencies Status](https://versions.deps.co/life-research/csv-crypt/status.svg)](https://versions.deps.co/life-research/csv-crypt)
+
 A command line tool which encrypts a CSV file line by line so that it's possible to exchange identifiers without being able to inspect the rest of the data.
 
 ## Usage
@@ -27,7 +29,7 @@ csv-crypt --gen-key
 ## Build
 
 ```sh
-lein uberjar
+make csv-crypt
 ```
 
 ## License
