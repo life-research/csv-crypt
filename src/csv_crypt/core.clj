@@ -16,7 +16,9 @@
 
 (set! *warn-on-reflection* true)
 
-(defn read-csv [xform filename]
+(defn read-csv
+  "Reads CSV-data from file into a vector by applying `xform` to each line."
+  [xform filename]
   (with-open [file (io/reader filename)]
     (into [] xform (csv/read-csv file))))
 
@@ -25,6 +27,11 @@
     (csv/write-csv file data)))
 
 (defn encrypt-line
+  "Encrypts the data of line starting with the second column.
+
+  Doesn't touch the first column. Uses AES128-CBC-HMAC-SHA256 with a 16-byte
+  random initialization vector (IV). Returns a tuple of the first column and
+  a Base64 encoded concatenation of the IV and the cipher text."
   {:arglists '([key line])}
   [key [first & rest]]
   (let [iv (nonce/random-bytes 16)
@@ -34,6 +41,12 @@
     [first (Base64/encodeBase64String (bytes/concat iv cipher-text))]))
 
 (defn decrypt-line
+  "Decrypts the data of line.
+
+  Doesn't touch the first column and expects the encrypted data in the second
+  column. Also doesn't care about other columns. Expects the encrypted data to
+  be a Base64 encoded concatenation of a 16-byte initialization vector (IV) and
+  the cipher text. Uses AES128-CBC-HMAC-SHA256."
   {:arglists '([key line])}
   [key [first second]]
   (let [iv-and-cipher-text (Base64/decodeBase64 ^String second)
