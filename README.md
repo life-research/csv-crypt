@@ -32,7 +32,7 @@ lein uberjar
 
 ## License
 
-Copyright © 2017 LIFE
+Copyright © 2017 Leipzig Research Centre for Civilization Diseases (LIFE)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
