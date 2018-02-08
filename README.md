@@ -12,7 +12,7 @@ Download an archive for your OS:
 * Windows
 * Linux
 
-Unpack the archive. It will create a directory called `csv-crypt-0.1-SNAPSHOT`. Open console in this directory and run `csv-crypt`.
+Unpack the archive. It will create a directory called `csv-crypt-0.1`. Open console in this directory and run `csv-crypt`.
 
 ## Usage
 

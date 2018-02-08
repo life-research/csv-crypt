@@ -1,4 +1,4 @@
-(defproject csv-crypt "0.1-SNAPSHOT"
+(defproject csv-crypt "0.1"
   :description "Line-by-line CSV Encryption Tool"
   :url "https://github.com/life-research/csv-crypt"
   :license {:name "Eclipse Public License"
