@@ -5,6 +5,15 @@
 
 A command line tool which encrypts a CSV file line by line so that it's possible to exchange identifiers without being able to inspect the rest of the data.
 
+## Install
+
+Download an archive for your OS:
+
+* Windows
+* Linux
+
+Unpack the archive. It will create a directory called `csv-crypt-0.1-SNAPSHOT`. Open console in this directory and run `csv-crypt`.
+
 ## Usage
 
 ### Generate Encryption Key
@@ -29,9 +38,13 @@ csv-crypt --gen-key
 
 ## Build
 
+To create a ZIP for Windows and a tar.gz for Linux run:
+
 ```sh
-make csv-crypt
+make all
 ```
+
+The files will be in `target/win` and `target/linux`.
 
 ## License
 

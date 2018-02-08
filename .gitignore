@@ -4,7 +4,3 @@
 /.lein-*
 /.nrepl-port
 /*.csv
-/csv-crypt
-/*.jar
-/*.zip
-/*.tar.gz
