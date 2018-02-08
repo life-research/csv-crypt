@@ -18,13 +18,13 @@
 
 (defn read-csv
   "Reads CSV-data from file into a vector by applying `xform` to each line."
-  [xform filename]
+  [xform filename separator]
   (with-open [file (io/reader filename)]
-    (into [] xform (csv/read-csv file))))
+    (into [] xform (csv/read-csv file :separator separator))))
 
-(defn write-csv [data filename]
+(defn write-csv [data filename separator]
   (with-open [file (io/writer filename)]
-    (csv/write-csv file data)))
+    (csv/write-csv file data :separator separator)))
 
 (defn encrypt-line
   "Encrypts the data of line starting with the second column.
@@ -34,11 +34,13 @@
   a Base64 encoded concatenation of the IV and the cipher text."
   {:arglists '([key line])}
   [key [first & rest]]
-  (let [iv (nonce/random-bytes 16)
-        clear-text (json/generate-cbor rest)
-        cipher-text (crypto/encrypt clear-text key iv
-                                    {:algorithm :aes128-cbc-hmac-sha256})]
-    [first (Base64/encodeBase64String (bytes/concat iv cipher-text))]))
+  (if rest
+    (let [iv (nonce/random-bytes 16)
+          clear-text (json/generate-cbor rest)
+          cipher-text (crypto/encrypt clear-text key iv
+                                      {:algorithm :aes128-cbc-hmac-sha256})]
+      [first (Base64/encodeBase64String (bytes/concat iv cipher-text))])
+    [first]))
 
 (defn decrypt-line
   "Decrypts the data of line.
@@ -49,26 +51,30 @@
   the cipher text. Uses AES128-CBC-HMAC-SHA256."
   {:arglists '([key line])}
   [key [first second]]
-  (let [iv-and-cipher-text (Base64/decodeBase64 ^String second)
-        iv (bytes/slice iv-and-cipher-text 0 16)
-        cipher-text (bytes/slice iv-and-cipher-text 16 (count iv-and-cipher-text))
-        clear-text (crypto/decrypt cipher-text key iv
-                                   {:algorithm :aes128-cbc-hmac-sha256})]
-    (cons first (json/parse-cbor clear-text))))
+  (if second
+    (let [iv-and-cipher-text (Base64/decodeBase64 ^String second)
+          iv (bytes/slice iv-and-cipher-text 0 16)
+          cipher-text (bytes/slice iv-and-cipher-text 16 (count iv-and-cipher-text))
+          clear-text (crypto/decrypt cipher-text key iv
+                                     {:algorithm :aes128-cbc-hmac-sha256})]
+      (cons first (json/parse-cbor clear-text)))
+    [first]))
 
-(defn encrypt-file [key in-filename out-filename]
-  (-> (read-csv (map #(encrypt-line key %)) in-filename)
-      (write-csv out-filename)))
+(defn encrypt-file [key in-filename out-filename separator]
+  (-> (read-csv (map #(encrypt-line key %)) in-filename separator)
+      (write-csv out-filename separator)))
 
-(defn decrypt-file [key in-filename out-filename]
-  (-> (read-csv (map #(decrypt-line key %)) in-filename)
-      (write-csv out-filename)))
+(defn decrypt-file [key in-filename out-filename separator]
+  (-> (read-csv (map #(decrypt-line key %)) in-filename separator)
+      (write-csv out-filename separator)))
 
 (def cli-options
   [["-k" "--key KEY" "32-byte hex encoded key"]
    ["-e" "--encrypt"]
    ["-d" "--decrypt"]
    ["-g" "--gen-key"]
+   ["-s" "--separator SEPARATOR" :default \, :default-desc "(default \\,)"
+    :parse-fn first]
    ["-h" "--help"]])
 
 (defn print-help [summary exit]
@@ -77,7 +83,7 @@
   (System/exit exit))
 
 (defn -main [& args]
-  (let [{{:keys [key encrypt decrypt gen-key help]} :options
+  (let [{{:keys [key encrypt decrypt gen-key separator help]} :options
          [in-filename out-filename] :arguments
          :keys [summary]}
         (cli/parse-opts args cli-options)]
@@ -88,9 +94,9 @@
         (print-help summary 1)))
     (cond
       encrypt
-      (encrypt-file (codecs/hex->bytes key) in-filename out-filename)
+      (encrypt-file (codecs/hex->bytes key) in-filename out-filename separator)
       decrypt
-      (decrypt-file (codecs/hex->bytes key) in-filename out-filename)
+      (decrypt-file (codecs/hex->bytes key) in-filename out-filename separator)
       gen-key
       (println (codecs/bytes->hex (nonce/random-bytes 32)))
       :else

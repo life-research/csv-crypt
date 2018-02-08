@@ -16,6 +16,16 @@ Unpack the archive. It will create a directory called `csv-crypt-0.1`. Open cons
 
 ## Usage
 
+```
+Usage: csv-crypt [-g] [-e -k key in-file out-file] [-d -k key in-file out-file]
+  -k, --key KEY                            32-byte hex encoded key
+  -e, --encrypt
+  -d, --decrypt
+  -g, --gen-key
+  -s, --separator SEPARATOR  (default \,)
+  -h, --help
+```
+
 ### Generate Encryption Key
 
 Generates a random key with 32 bytes of entropy using a cryptographically secure random number generator.
@@ -27,13 +37,13 @@ csv-crypt --gen-key
 ### Encrypt a CSV File
 
 ```sh
-./csv-crypt --encrypt --key <key> <in-file> <out-file> 
+csv-crypt --encrypt --key <key> <in-file> <out-file> 
 ```
 
 ### Decrypt a CSV File
 
 ```sh
-./csv-crypt --decrypt --key <key> <in-file> <out-file> 
+csv-crypt --decrypt --key <key> <in-file> <out-file> 
 ```
 
 ## Build
