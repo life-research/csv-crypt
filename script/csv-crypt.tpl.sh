@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-java -jar csv-crypt-<VERSION>-standalone.jar $@
+BASEDIR=$(dirname "$0")
+
+java -jar "${BASEDIR}/csv-crypt-<VERSION>-standalone.jar" $@

@@ -1,3 +1,3 @@
 @echo off
 
-java -jar csv-crypt-<VERSION>-standalone.jar %*
+java -jar "%~dp0csv-crypt-<VERSION>-standalone.jar" %*
