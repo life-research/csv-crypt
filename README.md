@@ -1,5 +1,6 @@
 # CSV Crypt
 
+[![Build Status](https://travis-ci.org/life-research/csv-crypt.svg?branch=master)](https://travis-ci.org/life-research/csv-crypt)
 [![Dependencies Status](https://versions.deps.co/life-research/csv-crypt/status.svg)](https://versions.deps.co/life-research/csv-crypt)
 
 A command line tool which encrypts a CSV file line by line so that it's possible to exchange identifiers without being able to inspect the rest of the data.
