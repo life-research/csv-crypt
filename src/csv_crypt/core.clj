@@ -7,6 +7,7 @@
     [buddy.core.keys :as keys]
     [buddy.core.nonce :as nonce]
     [cheshire.core :as json]
+    [clj-bom.core :as bom]
     [clojure.data.csv :as csv]
     [clojure.java.io :as io]
     [clojure.tools.cli :as cli])
@@ -19,7 +20,7 @@
 (defn read-csv
   "Reads CSV-data from file into a vector by applying `xform` to each line."
   [xform filename separator]
-  (with-open [file (io/reader filename)]
+  (with-open [file (bom/bom-reader filename)]
     (into [] xform (csv/read-csv file :separator separator))))
 
 (defn write-csv [data filename separator]
