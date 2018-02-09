@@ -18,11 +18,14 @@ Unpack the archive. It will create a directory called `csv-crypt-0.1`. Open cons
 
 ```
 Usage: csv-crypt [-g] [-e -k key in-file out-file] [-d -k key in-file out-file]
-  -k, --key KEY                            32-byte hex encoded key
+  -k, --key KEY                                32-byte hex encoded key
   -e, --encrypt
   -d, --decrypt
   -g, --gen-key
-  -s, --separator SEPARATOR  (default \,)
+      --in-separator SEPARATOR   (default \,)
+      --in-tab-separated                       Input file is tab separated
+      --out-separator SEPARATOR  (default \,)
+      --out-tab-separated                      Output file should be tab separated
   -h, --help
 ```
 

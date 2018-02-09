@@ -60,21 +60,25 @@
       (cons first (json/parse-cbor clear-text)))
     [first]))
 
-(defn encrypt-file [key in-filename out-filename separator]
-  (-> (read-csv (map #(encrypt-line key %)) in-filename separator)
-      (write-csv out-filename separator)))
+(defn encrypt-file [key in-filename out-filename in-separator out-separator]
+  (-> (read-csv (map #(encrypt-line key %)) in-filename in-separator)
+      (write-csv out-filename out-separator)))
 
-(defn decrypt-file [key in-filename out-filename separator]
-  (-> (read-csv (map #(decrypt-line key %)) in-filename separator)
-      (write-csv out-filename separator)))
+(defn decrypt-file [key in-filename out-filename in-separator out-separator]
+  (-> (read-csv (map #(decrypt-line key %)) in-filename in-separator)
+      (write-csv out-filename out-separator)))
 
 (def cli-options
   [["-k" "--key KEY" "32-byte hex encoded key"]
    ["-e" "--encrypt"]
    ["-d" "--decrypt"]
    ["-g" "--gen-key"]
-   ["-s" "--separator SEPARATOR" :default \, :default-desc "(default \\,)"
+   [nil "--in-separator SEPARATOR" :default \, :default-desc "(default \\,)"
     :parse-fn first]
+   [nil "--in-tab-separated" "Input file is tab separated"]
+   [nil "--out-separator SEPARATOR" :default \, :default-desc "(default \\,)"
+    :parse-fn first]
+   [nil "--out-tab-separated" "Output file should be tab separated"]
    ["-h" "--help"]])
 
 (defn print-help [summary exit]
@@ -83,10 +87,15 @@
   (System/exit exit))
 
 (defn -main [& args]
-  (let [{{:keys [key encrypt decrypt gen-key separator help]} :options
+  (let [{{:keys [key encrypt decrypt gen-key
+                 in-separator out-separator
+                 in-tab-separated out-tab-separated
+                 help]} :options
          [in-filename out-filename] :arguments
          :keys [summary]}
-        (cli/parse-opts args cli-options)]
+        (cli/parse-opts args cli-options)
+        in-separator (if in-tab-separated \tab in-separator)
+        out-separator (if out-tab-separated \tab out-separator)]
     (when help
       (print-help summary 0))
     (when (or encrypt decrypt)
@@ -94,9 +103,11 @@
         (print-help summary 1)))
     (cond
       encrypt
-      (encrypt-file (codecs/hex->bytes key) in-filename out-filename separator)
+      (encrypt-file (codecs/hex->bytes key) in-filename out-filename
+                    in-separator out-separator)
       decrypt
-      (decrypt-file (codecs/hex->bytes key) in-filename out-filename separator)
+      (decrypt-file (codecs/hex->bytes key) in-filename out-filename
+                    in-separator out-separator)
       gen-key
       (println (codecs/bytes->hex (nonce/random-bytes 32)))
       :else
