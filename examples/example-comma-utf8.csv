@@ -1,0 +1,7 @@
+id,d1,d2
+1,a,23
+2,longer text with spaces,42
+3,text with german umlauts: äüöß,96
+4,"text with
+newline",2018
+5,"comma ,",semicolon ;

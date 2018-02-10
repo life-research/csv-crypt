@@ -22,6 +22,7 @@ Usage: csv-crypt [-g] [-e -k key in-file out-file] [-d -k key in-file out-file]
   -e, --encrypt
   -d, --decrypt
   -g, --gen-key
+      --in-encoding ENCODING     UTF-8
       --in-separator SEPARATOR   (default \,)
       --in-tab-separated                       Input file is tab separated
       --out-separator SEPARATOR  (default \,)
@@ -39,15 +40,29 @@ csv-crypt --gen-key
 
 ### Encrypt a CSV File
 
+The default encoding `UFT-8` and the default separator `,` is used.
+
 ```sh
 csv-crypt --encrypt --key <key> <in-file> <out-file> 
 ```
 
 ### Decrypt a CSV File
 
+The default encoding `UFT-8` and the default separator `,` is used.
+
 ```sh
 csv-crypt --decrypt --key <key> <in-file> <out-file> 
 ```
+
+### Encrypt an Excel Unicode Text File
+
+Excel can save spreadsheets as an Unicode Text File. This is the safest way to feed a spreadsheet into `csv-crypt`. An example of such a file can be found in the repository as `examples/excel-2013-unicode-text.txt`. Because the file is tab-separated, you have to use the command line switch `--in-tab-separated`:
+
+```sh
+csv-crypt --encrypt --key <key> --in-tab-separated <in-file> <out-file> 
+```
+
+The output file will be still comma-separated.
 
 ## Build
 

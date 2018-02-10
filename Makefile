@@ -1,6 +1,9 @@
 version = 0.1
 
 target/csv-crypt-$(version)-standalone.jar:
+	lein clean
+	lein test
+	lein clean
 	lein uberjar
 
 target/win/csv-crypt-$(version)/csv-crypt.bat: script/csv-crypt.tpl.bat

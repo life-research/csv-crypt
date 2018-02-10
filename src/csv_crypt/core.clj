@@ -12,15 +12,23 @@
     [clojure.java.io :as io]
     [clojure.tools.cli :as cli])
   (:import
+    [java.io Reader]
     [org.apache.commons.codec.binary Base64])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
 
+(defn bom-reader
+  [in & opts]
+  (let [is (io/input-stream in)]
+    (if-let [encoding (bom/detect-encoding is)]
+      (doto (io/reader is :encoding encoding) (.skip 1))
+      (apply io/reader is opts))))
+
 (defn read-csv
   "Reads CSV-data from file into a vector by applying `xform` to each line."
-  [xform filename separator]
-  (with-open [reader (bom/bom-reader filename)]
+  [xform filename encoding separator]
+  (with-open [^Reader reader (bom-reader filename :encoding encoding)]
     (into [] xform (csv/read-csv reader :separator separator))))
 
 (defn write-csv [data filename separator]
@@ -61,12 +69,14 @@
       (cons first (json/parse-cbor clear-text)))
     [first]))
 
-(defn encrypt-file [key in-filename out-filename in-separator out-separator]
-  (-> (read-csv (map #(encrypt-line key %)) in-filename in-separator)
+(defn encrypt-file
+  [key in-filename out-filename in-encoding in-separator out-separator]
+  (-> (read-csv (map #(encrypt-line key %)) in-filename in-encoding in-separator)
       (write-csv out-filename out-separator)))
 
-(defn decrypt-file [key in-filename out-filename in-separator out-separator]
-  (-> (read-csv (map #(decrypt-line key %)) in-filename in-separator)
+(defn decrypt-file
+  [key in-filename out-filename in-encoding in-separator out-separator]
+  (-> (read-csv (map #(decrypt-line key %)) in-filename in-encoding in-separator)
       (write-csv out-filename out-separator)))
 
 (def cli-options
@@ -74,6 +84,7 @@
    ["-e" "--encrypt"]
    ["-d" "--decrypt"]
    ["-g" "--gen-key"]
+   [nil "--in-encoding ENCODING" :default "UTF-8"]
    [nil "--in-separator SEPARATOR" :default \, :default-desc "(default \\,)"
     :parse-fn first]
    [nil "--in-tab-separated" "Input file is tab separated"]
@@ -83,12 +94,15 @@
    ["-h" "--help"]])
 
 (defn print-help [summary exit]
-  (println "Usage: csv-crypt [-g] [-e -k key in-file out-file] [-d -k key in-file out-file]")
+  (println "Usage: csv-crypt [-g]"
+           "[-e -k key in-file out-file]"
+           "[-d -k key in-file out-file]")
   (println summary)
   (System/exit exit))
 
 (defn -main [& args]
   (let [{{:keys [key encrypt decrypt gen-key
+                 in-encoding
                  in-separator out-separator
                  in-tab-separated out-tab-separated
                  help]} :options
@@ -105,9 +119,11 @@
     (cond
       encrypt
       (encrypt-file (codecs/hex->bytes key) in-filename out-filename
+                    in-encoding
                     in-separator out-separator)
       decrypt
       (decrypt-file (codecs/hex->bytes key) in-filename out-filename
+                    in-encoding
                     in-separator out-separator)
       gen-key
       (println (codecs/bytes->hex (nonce/random-bytes 32)))
