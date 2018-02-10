@@ -9,10 +9,10 @@ A command line tool which encrypts a CSV file line by line so that it's possible
 
 Download an archive for your OS:
 
-* [Windows](https://github.com/life-research/csv-crypt/releases/download/v0.1/csv-crypt-0.1.zip)
-* [Linux](https://github.com/life-research/csv-crypt/releases/download/v0.1/csv-crypt-0.1.tar.gz)
+* [Windows](https://github.com/life-research/csv-crypt/releases/download/v0.2/csv-crypt-0.2.zip)
+* [Linux](https://github.com/life-research/csv-crypt/releases/download/v0.2/csv-crypt-0.2.tar.gz)
 
-Unpack the archive. It will create a directory called `csv-crypt-0.1`. Open console in this directory and run `csv-crypt`.
+Unpack the archive. It will create a directory called `csv-crypt-0.2`. Open console in this directory and run `csv-crypt`.
 
 ## Usage
 
