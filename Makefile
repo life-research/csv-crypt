@@ -1,4 +1,4 @@
-version = 0.3-SNAPSHOT
+version = 0.3
 
 target/csv-crypt-$(version)-standalone.jar:
 	lein clean
