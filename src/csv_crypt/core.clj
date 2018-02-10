@@ -20,12 +20,12 @@
 (defn read-csv
   "Reads CSV-data from file into a vector by applying `xform` to each line."
   [xform filename separator]
-  (with-open [file (bom/bom-reader filename)]
-    (into [] xform (csv/read-csv file :separator separator))))
+  (with-open [reader (bom/bom-reader filename)]
+    (into [] xform (csv/read-csv reader :separator separator))))
 
 (defn write-csv [data filename separator]
-  (with-open [file (io/writer filename)]
-    (csv/write-csv file data :separator separator)))
+  (with-open [writer (io/writer filename)]
+    (csv/write-csv writer data :separator separator)))
 
 (defn encrypt-line
   "Encrypts the data of line starting with the second column.
