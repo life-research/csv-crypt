@@ -27,6 +27,7 @@ Usage: csv-crypt [-g] [-e -k key in-file out-file] [-d -k key in-file out-file]
       --in-tab-separated                       Input file is tab separated
       --out-separator SEPARATOR  (default \,)
       --out-tab-separated                      Output file should be tab separated
+      --out-optimize-win                       Optimize the output for Office 2010+
   -h, --help
 ```
 
@@ -63,6 +64,10 @@ csv-crypt --encrypt --key <key> --in-tab-separated <in-file> <out-file>
 ```
 
 The output file will be still comma-separated.
+
+### Optimize the Output File for Office 2010+
+
+In order to produce a output file which can be opened in Excel 2010+, you can use the command line switch `--out-optimize-win`. Please be sure to also use the `csv` file extension. The resulting file opens correctly in Excel.
 
 ## Build
 

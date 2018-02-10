@@ -31,8 +31,9 @@
   (with-open [^Reader reader (bom-reader filename :encoding encoding)]
     (into [] xform (csv/read-csv reader :separator separator))))
 
-(defn write-csv [data filename separator]
-  (with-open [writer (io/writer filename)]
+(defn write-csv [data filename with-bom? encoding separator]
+  (with-open [writer (if with-bom? (bom/bom-writer encoding filename)
+                                   (io/writer filename :encoding encoding))]
     (csv/write-csv writer data :separator separator)))
 
 (defn encrypt-line
@@ -70,14 +71,26 @@
     [first]))
 
 (defn encrypt-file
-  [key in-filename out-filename in-encoding in-separator out-separator]
+  [key in-filename out-filename
+   {:keys [in-encoding in-separator out-with-bom? out-encoding out-separator]
+    :or {in-encoding "UTF-8"
+         in-separator \,
+         out-with-bom? false
+         out-encoding "UTF-8"
+         out-separator \,}}]
   (-> (read-csv (map #(encrypt-line key %)) in-filename in-encoding in-separator)
-      (write-csv out-filename out-separator)))
+      (write-csv out-filename out-with-bom? out-encoding out-separator)))
 
 (defn decrypt-file
-  [key in-filename out-filename in-encoding in-separator out-separator]
+  [key in-filename out-filename
+   {:keys [in-encoding in-separator out-with-bom? out-encoding out-separator]
+    :or {in-encoding "UTF-8"
+         in-separator \,
+         out-with-bom? false
+         out-encoding "UTF-8"
+         out-separator \,}}]
   (-> (read-csv (map #(decrypt-line key %)) in-filename in-encoding in-separator)
-      (write-csv out-filename out-separator)))
+      (write-csv out-filename out-with-bom? out-encoding out-separator)))
 
 (def cli-options
   [["-k" "--key KEY" "32-byte hex encoded key"]
@@ -91,6 +104,7 @@
    [nil "--out-separator SEPARATOR" :default \, :default-desc "(default \\,)"
     :parse-fn first]
    [nil "--out-tab-separated" "Output file should be tab separated"]
+   [nil "--out-optimize-win" "Optimize the output for Office 2010+"]
    ["-h" "--help"]])
 
 (defn print-help [summary exit]
@@ -100,17 +114,27 @@
   (println summary)
   (System/exit exit))
 
+(defn- out-encoding [{:keys [out-optimize-win]}]
+  (if out-optimize-win "UTF-16LE" "UTF-8"))
+
+(defn- out-separator
+  [{:keys [out-separator out-tab-separated out-optimize-win]}]
+  (if (or out-tab-separated out-optimize-win)
+    \tab
+    out-separator))
+
 (defn -main [& args]
   (let [{{:keys [key encrypt decrypt gen-key
-                 in-encoding
-                 in-separator out-separator
-                 in-tab-separated out-tab-separated
-                 help]} :options
+                 in-encoding in-separator in-tab-separated
+                 out-optimize-win
+                 help]
+          :as options} :options
          [in-filename out-filename] :arguments
          :keys [summary]}
         (cli/parse-opts args cli-options)
         in-separator (if in-tab-separated \tab in-separator)
-        out-separator (if out-tab-separated \tab out-separator)]
+        out-encoding (out-encoding options)
+        out-separator (out-separator options)]
     (when help
       (print-help summary 0))
     (when (or encrypt decrypt)
@@ -119,12 +143,18 @@
     (cond
       encrypt
       (encrypt-file (codecs/hex->bytes key) in-filename out-filename
-                    in-encoding
-                    in-separator out-separator)
+                    {:in-encoding in-encoding
+                     :in-separator in-separator
+                     :out-with-bom? out-optimize-win
+                     :out-encoding out-encoding
+                     :out-separator out-separator})
       decrypt
       (decrypt-file (codecs/hex->bytes key) in-filename out-filename
-                    in-encoding
-                    in-separator out-separator)
+                    {:in-encoding in-encoding
+                     :in-separator in-separator
+                     :out-with-bom? out-optimize-win
+                     :out-encoding out-encoding
+                     :out-separator out-separator})
       gen-key
       (println (codecs/bytes->hex (nonce/random-bytes 32)))
       :else
