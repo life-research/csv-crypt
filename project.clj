@@ -13,7 +13,7 @@
    [clj-bom "0.1.2"]
    [org.clojure/clojure "1.9.0"]
    [org.clojure/data.csv "0.1.4"]
-   [org.clojure/tools.cli "0.3.5"]]
+   [org.clojure/tools.cli "0.3.7"]]
 
   :profiles
   {:uberjar
