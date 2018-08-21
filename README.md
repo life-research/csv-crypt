@@ -47,6 +47,8 @@ The default encoding `UTF-8` and the default separator `,` is used.
 csv-crypt --encrypt --key <key> <in-file> <out-file> 
 ```
 
+The encrypted values are encoded in [Base64][1] so that they contain only printable characters which are available in almost all charsets.
+
 ### Decrypt a CSV File
 
 The default encoding `UTF-8` and the default separator `,` is used.
@@ -85,3 +87,5 @@ Copyright © 2017 Leipzig Research Centre for Civilization Diseases (LIFE)
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+
+[1]: <https://en.wikipedia.org/wiki/Base64>
