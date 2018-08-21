@@ -41,7 +41,7 @@ csv-crypt --gen-key
 
 ### Encrypt a CSV File
 
-The default encoding `UFT-8` and the default separator `,` is used.
+The default encoding `UTF-8` and the default separator `,` is used.
 
 ```sh
 csv-crypt --encrypt --key <key> <in-file> <out-file> 
@@ -49,7 +49,7 @@ csv-crypt --encrypt --key <key> <in-file> <out-file>
 
 ### Decrypt a CSV File
 
-The default encoding `UFT-8` and the default separator `,` is used.
+The default encoding `UTF-8` and the default separator `,` is used.
 
 ```sh
 csv-crypt --decrypt --key <key> <in-file> <out-file> 
