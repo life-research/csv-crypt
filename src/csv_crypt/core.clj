@@ -2,11 +2,10 @@
   (:require
     [buddy.core.bytes :as bytes]
     [buddy.core.codecs :as codecs]
-    [buddy.core.codecs.base64 :as b64]
     [buddy.core.crypto :as crypto]
-    [buddy.core.keys :as keys]
     [buddy.core.nonce :as nonce]
     [cheshire.core :as json]
+    [cognitect.anomalies :as anom]
     [clj-bom.core :as bom]
     [clojure.data.csv :as csv]
     [clojure.java.io :as io]
@@ -52,6 +51,14 @@
       [first (Base64/encodeBase64String (bytes/concat iv cipher-text))])
     [first]))
 
+(defn decrypt [input key iv]
+  (try
+    (crypto/decrypt input key iv {:algorithm :aes128-cbc-hmac-sha256})
+    (catch Exception e
+      #::anom
+          {:category ::anom/incorrect
+           :message (str "Problem while decrypting: " (.getMessage e))})))
+
 (defn decrypt-line
   "Decrypts the data of line.
 
@@ -62,13 +69,24 @@
   {:arglists '([key line])}
   [key [first second]]
   (if second
-    (let [iv-and-cipher-text (Base64/decodeBase64 ^String second)
-          iv (bytes/slice iv-and-cipher-text 0 16)
-          cipher-text (bytes/slice iv-and-cipher-text 16 (count iv-and-cipher-text))
-          clear-text (crypto/decrypt cipher-text key iv
-                                     {:algorithm :aes128-cbc-hmac-sha256})]
-      (cons first (json/parse-cbor clear-text)))
+    (let [iv-and-cipher-text (Base64/decodeBase64 ^String second)]
+      (if (< (count iv-and-cipher-text) 32)
+        #::anom
+            {:category ::anom/incorrect
+             :message "Invalid cipher text."}
+        (let [iv (bytes/slice iv-and-cipher-text 0 16)
+              cipher-text (bytes/slice iv-and-cipher-text 16 (count iv-and-cipher-text))
+              clear-text (decrypt cipher-text key iv)]
+          (if (and (map? clear-text) (::anom/category clear-text))
+            clear-text
+            (cons first (json/parse-cbor clear-text))))))
     [first]))
+
+(defn decrypt-line-indexed [key index line]
+  (let [line (decrypt-line key line)]
+    (if (::anom/category line)
+      (assoc line ::line-index index)
+      line)))
 
 (defn encrypt-file
   [key in-filename out-filename
@@ -89,8 +107,14 @@
          out-with-bom? false
          out-encoding "UTF-8"
          out-separator \,}}]
-  (-> (read-csv (map #(decrypt-line key %)) in-filename in-encoding in-separator)
-      (write-csv out-filename out-with-bom? out-encoding out-separator)))
+  (let [decrypt (map-indexed #(decrypt-line-indexed key %1 %2))
+        lines (read-csv decrypt in-filename in-encoding in-separator)]
+    (if (some ::anom/category lines)
+      (let [{::anom/keys [message] ::keys [line-index]} (first (filter map? lines))]
+        (println "Problem in line" (str (inc line-index) ":"))
+        (println "    " message))
+      (-> lines
+          (write-csv out-filename out-with-bom? out-encoding out-separator)))))
 
 (def cli-options
   [["-k" "--key KEY" "32-byte hex encoded key"]
