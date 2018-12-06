@@ -133,7 +133,7 @@
    ["-h" "--help"]])
 
 (defn print-version []
-  (println "csv-crypt version 0.4")
+  (println "csv-crypt version 0.5")
   (System/exit 0))
 
 (defn print-help [summary exit]
