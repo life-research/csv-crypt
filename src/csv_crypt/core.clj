@@ -129,7 +129,12 @@
     :parse-fn first]
    [nil "--out-tab-separated" "Output file should be tab separated"]
    [nil "--out-optimize-win" "Optimize the output for Office 2010+"]
+   ["-v" "--version"]
    ["-h" "--help"]])
+
+(defn print-version []
+  (println "csv-crypt version 0.4")
+  (System/exit 0))
 
 (defn print-help [summary exit]
   (println "Usage: csv-crypt [-g]"
@@ -151,7 +156,7 @@
   (let [{{:keys [key encrypt decrypt gen-key
                  in-encoding in-separator in-tab-separated
                  out-optimize-win
-                 help]
+                 version help]
           :as options} :options
          [in-filename out-filename] :arguments
          :keys [summary]}
@@ -159,6 +164,8 @@
         in-separator (if in-tab-separated \tab in-separator)
         out-encoding (out-encoding options)
         out-separator (out-separator options)]
+    (when version
+      (print-version))
     (when help
       (print-help summary 0))
     (when (or encrypt decrypt)
