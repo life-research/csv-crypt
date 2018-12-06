@@ -11,6 +11,7 @@
   [[buddy/buddy-core "1.5.0"]
    [cheshire "5.8.0"]
    [clj-bom "0.1.2"]
+   [com.cognitect/anomalies "0.1.12"]
    [org.bouncycastle/bcpkix-jdk15on "1.60"]
    [org.bouncycastle/bcprov-jdk15on "1.60"]
    [org.clojure/clojure "1.9.0"]
@@ -18,6 +19,9 @@
    [org.clojure/tools.cli "0.3.7"]]
 
   :profiles
-  {:uberjar
+  {:dev
+   {:dependencies
+    [[org.clojars.akiel/iota "0.1"]]}
+   :uberjar
    {:main csv-crypt.core
     :aot :all}})
