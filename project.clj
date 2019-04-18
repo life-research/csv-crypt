@@ -12,11 +12,11 @@
    [cheshire "5.8.1"]
    [clj-bom "0.1.2"]
    [com.cognitect/anomalies "0.1.12"]
-   [org.bouncycastle/bcpkix-jdk15on "1.60"]
-   [org.bouncycastle/bcprov-jdk15on "1.60"]
-   [org.clojure/clojure "1.9.0"]
+   [org.bouncycastle/bcpkix-jdk15on "1.61"]
+   [org.bouncycastle/bcprov-jdk15on "1.61"]
+   [org.clojure/clojure "1.10.0"]
    [org.clojure/data.csv "0.1.4"]
-   [org.clojure/tools.cli "0.4.1"]]
+   [org.clojure/tools.cli "0.4.2"]]
 
   :profiles
   {:dev
